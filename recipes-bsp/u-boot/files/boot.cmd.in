@@ -1,0 +1,54 @@
+test -n "${BOOT_ORDER}" || env set BOOT_ORDER "A B"
+test -n "${BOOT_A_LEFT}" || env set BOOT_A_LEFT 3
+test -n "${BOOT_B_LEFT}" || env set BOOT_B_LEFT 3
+
+env set boot_part
+env set rauc_slot
+
+for BOOT_SLOT in "${BOOT_ORDER}"; do
+    if test "x${boot_part}" != "x"; then
+        # stop checking after selecting a slot
+
+    elif test "x${BOOT_SLOT}" = "xA"; then
+        if itest ${BOOT_A_LEFT} -gt 0; then
+            setexpr BOOT_A_LEFT ${BOOT_A_LEFT} - 1
+            echo "Booting RAUC slot A"
+
+            setenv boot_part 2
+            setenv rauc_slot "A"
+        fi
+
+    elif test "x${BOOT_SLOT}" = "xB"; then
+        if itest ${BOOT_B_LEFT} -gt 0; then
+            setexpr BOOT_B_LEFT ${BOOT_B_LEFT} - 1
+            echo "Booting RAUC slot B"
+
+            setenv boot_part 3
+            setenv rauc_slot "B"
+        fi
+    fi
+done
+
+
+if test -n "${boot_part}"; then
+    saveenv
+else
+    echo "No valid RAUC slot found. Resetting attempts to 3"
+    setenv BOOT_A_LEFT 3
+    setenv BOOT_B_LEFT 3
+    saveenv
+    reset
+fi
+
+env set boot_dev @@BOOT_DEV@@
+env set os_boot_dev @@OS_BOOT_DEV@@
+
+env set os_root_dev ${os_boot_dev}p${boot_part}
+setenv bootargs console=${console} root=${os_root_dev} ${root_opt} raucboot=on
+
+#1 Default option the linux image and the device tree from the boot partition #1
+#load mmc ${boot_dev}:1 ${loadaddr} ${image} && load mmc ${boot_dev}:1 ${fdt_addr_r} ${fdtfile} && booti ${loadaddr} - ${fdt_addr_r}
+
+#2 Advanced option the linux image and the device tree from the boot folder of the rootfs
+load mmc ${boot_dev}:${boot_part} ${loadaddr} boot/${image} && load mmc ${boot_dev}:${boot_part} ${fdt_addr_r} boot/${fdtfile} && booti ${loadaddr} - ${fdt_addr_r}
+echo "Unable to get booted with RAUC"
