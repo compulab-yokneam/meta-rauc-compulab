@@ -1,0 +1,21 @@
+#!/bin/bash -e
+
+BSP=$(pwd)
+SETUP=${SETUP:-"${BSP}/compulab-setup-env"}
+
+D=$(dirname $(dirname $(readlink -e ${BASH_SOURCE[0]})))
+
+# A temporarily fix for passing a "-b" key to the next script
+
+grep -w -- "-b" ${SETUP} && PARAM=$@ || PARAM="-b $@"
+
+source ${SETUP} ${PARAM}
+
+awk '{$0="# "$0}/local.conf/,0' ${D}/conf/layer.conf >> conf/local.conf
+
+cat << EOF >> conf/bblayers.conf
+BBLAYERS += "\${BSPDIR}/sources/meta-rauc"
+BBLAYERS += "\${BSPDIR}/sources/meta-rauc-compulab"
+EOF
+
+bitbake-layers remove-layer meta-compulab-uefi
