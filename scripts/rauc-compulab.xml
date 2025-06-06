@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<manifest>
+
+  <project name="meta-rauc-compulab" remote="compulab" revision="master" path="sources/meta-rauc-compulab">
+    <linkfile src="tools/rauc-setup-environment" dest="rauc-setup-environment" />
+  </project>
+
+  <remote fetch="https://github.com/rauc" name="rauc"/>
+
+  <project name="meta-rauc" remote="rauc" revision="scarthgap" path="sources/meta-rauc"/>
+  <project name="meta-rauc-community" remote="rauc" revision="scarthgap" path="sources/meta-rauc-community"/>
+
+</manifest>
