@@ -3,6 +3,5 @@ proc                 /proc                proc       defaults              0  0
 devpts               /dev/pts             devpts     mode=0620,ptmxmode=0666,gid=5      0  0
 tmpfs                /run                 tmpfs      mode=0755,nodev,nosuid,strictatime 0  0
 
-
-/dev/mmcblk2p1  /boot   vfat    defaults    0   0
-
+@@OS_BOOT_DEV@@p1  /boot   ext4    defaults    0   0
+@@OS_BOOT_DEV@@p4  /data   ext4    defaults    0   0
