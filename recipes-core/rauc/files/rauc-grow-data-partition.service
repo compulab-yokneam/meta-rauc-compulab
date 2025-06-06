@@ -1,0 +1,12 @@
+[Unit]
+Description=Grow File System on /data
+DefaultDependencies=no
+Before=data.mount
+
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+ExecStart=/usr/sbin/parted --script @@OS_BOOT_DEV@@ resizepart 4 100%
+
+[Install]
+WantedBy=data.mount
