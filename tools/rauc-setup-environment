@@ -19,3 +19,7 @@ BBLAYERS += "\${BSPDIR}/sources/meta-rauc-compulab"
 EOF
 
 bitbake-layers remove-layer meta-compulab-uefi
+
+# Generate example authentication keys
+bitbake openssl-native -caddto_recipe_sysroot
+${BSP}/sources/meta-rauc-community/create-example-keys.sh
