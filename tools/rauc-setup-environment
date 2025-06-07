@@ -2,6 +2,7 @@
 
 BSP=$(pwd)
 SETUP=${SETUP:-"${BSP}/compulab-setup-env"}
+RAUC_SLOT_rootfs="fsl-image-network-full-cmdline"
 
 D=$(dirname $(dirname $(readlink -e ${BASH_SOURCE[0]})))
 
@@ -13,6 +14,11 @@ source ${SETUP} ${PARAM}
 
 awk '{$0="# "$0}/local.conf/,0' ${D}/conf/layer.conf >> conf/local.conf
 
+cat << EOF >> conf/local.conf
+# Set default rauc target
+RAUC_SLOT_rootfs = "${RAUC_SLOT_rootfs}"
+EOF
+
 cat << EOF >> conf/bblayers.conf
 BBLAYERS += "\${BSPDIR}/sources/meta-rauc"
 BBLAYERS += "\${BSPDIR}/sources/meta-rauc-compulab"
@@ -23,3 +29,10 @@ bitbake-layers remove-layer meta-compulab-uefi
 # Generate example authentication keys
 bitbake openssl-native -caddto_recipe_sysroot
 ${BSP}/sources/meta-rauc-community/create-example-keys.sh
+
+cat << EOF
+RAUC Build Environment is ready
+Issue:
+	bitbake ${RAUC_SLOT_rootfs}
+	bitbake update-bundle
+EOF
